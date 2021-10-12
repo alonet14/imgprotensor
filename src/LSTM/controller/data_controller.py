@@ -41,8 +41,6 @@ def read_all_data_and_labeling(folder_data):
 # data_train duoi dang dataframe
 def generate_spec_batches(data_train, batch_size):
     values, labels=data_train
-
-
     data_len = len(labels)
 
 
