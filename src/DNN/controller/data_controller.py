@@ -28,10 +28,9 @@ def read_all_data_and_labeling(folder_data):
             file_path = root + '\\' + filename
             data = rf.read_data_trainning_file(file_path)
             value=data.to_numpy()
-            columns=value.shape[1]
             rows=value.shape[0]
             for j in range(rows):
-                values.append(value[j, :])
+                values.append(value[j, 1:])
             for i in range(rows):
                 labels.append(one_hot_label)
             # list_data_frame.append(data)

@@ -19,9 +19,13 @@ class Ensemble_Model():
                  output_size_ss, learning_rate_ss, reconstruct_nn_flag, train_sf_flag, train_ss_flag, model_path_nn,
                  model_path_sf, model_path_ss):
         # DoA Prediction
+
         # place holder
-        self.data_train_ = tf.placeholder(tf.float32, shape=[None, input_size_sf])
-        self.label_sf_ = tf.placeholder(tf.float32, shape=[None, output_size_sf * SF_NUM])
+        # 2000 : kich thuoc du lieu
+        self.data_train_ = tf.placeholder(tf.float32, shape=[None, 2000])
+        # 90: so lượng nhan
+        self.label_sf_ = tf.placeholder(tf.float32, shape=[None, 90])
+
         self.data_train = tf.transpose(self.data_train_)
         self.label_sf = tf.transpose(self.label_sf_)
 
@@ -41,15 +45,16 @@ class Ensemble_Model():
             self.W_ec = tf.Variable(
                 initial_value=tf.random_uniform([hidden_size_sf, input_size_sf], minval=-0.1, maxval=0.1),
                 trainable=True, name='W_ec')
+
             self.b_ec = tf.Variable(initial_value=tf.random_uniform([hidden_size_sf, 1], minval=-0.1, maxval=0.1),
                                     trainable=True, name='b_ec')
 
             # decoder parameters
             self.W_dc = tf.Variable(
-                initial_value=tf.random_uniform([output_size_sf * SF_NUM, hidden_size_sf], minval=-0.1, maxval=0.1),
+                initial_value=tf.random_uniform([output_size_sf, hidden_size_sf], minval=-0.1, maxval=0.1),
                 trainable=True, name='W_dc')
             self.b_dc = tf.Variable(
-                initial_value=tf.random_uniform([output_size_sf * SF_NUM, 1], minval=-0.1, maxval=0.1),
+                initial_value=tf.random_uniform([output_size_sf , 1], minval=-0.1, maxval=0.1),
                 trainable=True, name='b_dc')
 
         elif train_sf_flag == True:
@@ -73,7 +78,9 @@ class Ensemble_Model():
                                     trainable=False, name='b_dc')
 
         # output prediction
+        #W ec: trong so
         self.h_sf = tf.matmul(self.W_ec, self.data_train) + self.b_ec
+
         self.output_pred_sf = tf.matmul(self.W_dc, self.h_sf) + self.b_dc
 
         # output target
@@ -81,7 +88,8 @@ class Ensemble_Model():
 
         # loss and train
         self.error_sf = self.output_target_sf - self.output_pred_sf
-        self.loss_sf = tf.reduce_mean(tf.square(self.error_sf)) * (output_size_sf * SF_NUM)
+        self.loss_sf = tf.reduce_mean(tf.square(self.error_sf)) * (output_size_sf)
+
         # Tính accuracy
         self.correct_pred = tf.equal(tf.argmax(self.output_target_sf, 1), tf.argmax(self.output_pred_sf, 1))
         self.accuracy_sf = tf.reduce_mean(tf.cast(self.correct_pred, tf.float32))

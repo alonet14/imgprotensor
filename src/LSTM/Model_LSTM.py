@@ -14,11 +14,12 @@ class Ensemble_Model():
         # place holder
         self.data_train_ = tf.placeholder(tf.float32, shape=[None, input_size_ss])
         # self.label_ss_ = tf.placeholder(tf.float32, shape=[None, output_size_ss * SF_NUM])
-        self.label_ss_ = tf.placeholder(tf.float32, shape=[None, 121])
+        self.label_ss_ = tf.placeholder(tf.float32, shape=[None, 90])
         self.label_ss = tf.transpose(self.label_ss_)
         self.data_train = tf.transpose(self.data_train_)  # permute n_steps and batch_size
+
         #Reshape to prepare input to hidden activation
-        self.data_train = tf.reshape(self.data_train, [-1,input_size_ss])
+        self.data_train = tf.reshape(self.data_train, [-1, input_size_ss])
         self.data_train = tf.nn.relu(tf.matmul(self.data_train_,_weights['hidden']) + _biases['hidden'])
         #Split data because rnn cell needs a list of inputs for the RNN inner loop
         self.data_train = tf.split(self.data_train, 1, 0)

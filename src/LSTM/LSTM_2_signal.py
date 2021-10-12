@@ -279,7 +279,11 @@ def get_DOA_estimate(spec, DOA, doa_min, grid):
     return doa_est
 
 
+from controller.data_controller import *
 import tensorflow.compat.v1 as tf
+
+PROJECT_PATH = Path(__file__).parent.parent.parent
+CONFIG_DATA_FOLDER = str(PROJECT_PATH) + '\\dataset\\recorded_data_gen'
 
 tf.disable_v2_behavior()
 tf.reset_default_graph()
@@ -322,12 +326,13 @@ noise_flag_ss = 1  # 0: noise-free; 1: noise-present
 # # DNN parameters
 grid_ss = 1  # inter-grid angle in spatial spectrum
 
-input_size_ss = M * (M - 1)  # 90
+input_size_ss = 2000
+
 batch_size_ss = 32
 learning_rate_ss = 0.001
 num_epoch_ss = 400
 n_hidden = 256
-n_classes = 121
+n_classes = 90
 
 weights = {
     'hidden': tf.Variable(tf.random_normal([input_size_ss, n_hidden])),  # Hidden layer weights
@@ -338,19 +343,21 @@ biases = {
     'out': tf.Variable(tf.random_normal([n_classes]))
 }
 
-test_DOA = np.array([31, 41])
-test_K = len(test_DOA)
-test_SNR = np.array([10, 10])
-num_epoch_test = 1000
+# test_DOA = np.array([31, 41])
+# test_K = len(test_DOA)
+# test_SNR = np.array([10, 10])
+# num_epoch_test = 1000
 RMSE = []
 #
 # # Create data
 # data for the second network
-data_train_ss = generate_training_data_ss_AI(M, N, K_ss, d, wavelength, SNR_ss, doa_min, doa_max, step_ss, doa_delta,
-                                             NUM_REPEAT_SS, grid_ss, NUM_GRID_SS)
+# data_train_ss = generate_training_data_ss_AI(M, N, K_ss, d, wavelength, SNR_ss, doa_min, doa_max, step_ss, doa_delta,
+#                                              NUM_REPEAT_SS, grid_ss, NUM_GRID_SS)
+data_train_ss = read_all_data_and_labeling(CONFIG_DATA_FOLDER)
+
 save_path = 'new_model2/'
 # # Model
-enmod_2 = Ensemble_Model(input_size_ss, weights, biases, n_hidden, learning_rate_ss)
+enmod_2 = Ensemble_Model(input_size_ss, weights, biases, n_hidden)
 # #
 # Train
 with tf.Session() as sess:
@@ -359,7 +366,7 @@ with tf.Session() as sess:
     print('Training...')
     # train
     for epoch in range(num_epoch_ss):
-        [data_batches, label_batches] = generate_spec_batches(data_train_ss, batch_size_ss, noise_flag_ss)
+        [data_batches, label_batches] = generate_spec_batches(data_train_ss, batch_size_ss)
         # print(np.shape(data_batches))
         for batch_idx in range(len(data_batches)):
             data_batch = data_batches[batch_idx]
@@ -380,29 +387,29 @@ with tf.Session() as sess:
     # saver.restore(sess,save_path + 'modelLSTM')
     # # test
     est_DOA = []
-    MSE_rho = np.zeros([test_K, ])
-    for epoch in range(num_epoch_test):
-        with graph.as_default():
-            test_cov_vector = generate_array_cov_vector_AI(M, N, d, wavelength, test_DOA, test_SNR)
-            # data_batch = np.expand_dims(test_cov_vector, axis=-1)
-            # data_batch = data_batch.tolist()
-            #
-            test_cov_vector = test_cov_vector.reshape(1, test_cov_vector.shape[0])
-            data_batch = []
-            data_batch.append(test_cov_vector[0])
-            # print(data_batch.shape)
-            #
-            feed_dict = {enmod_2.data_train_: data_batch}
-            ss_output = sess.run(enmod_2.output_ss, feed_dict=feed_dict)
-            ss_min = np.min(ss_output)
-            ss_output_regularized = [ss if ss > -ss_min else [0.0] for ss in ss_output]
+    # MSE_rho = np.zeros([test_K, ])
+    # for epoch in range(num_epoch_test):
+    #     with graph.as_default():
+    #         test_cov_vector = generate_array_cov_vector_AI(M, N, d, wavelength, test_DOA, test_SNR)
+    #         # data_batch = np.expand_dims(test_cov_vector, axis=-1)
+    #         # data_batch = data_batch.tolist()
+    #         #
+    #         test_cov_vector = test_cov_vector.reshape(1, test_cov_vector.shape[0])
+    #         data_batch = []
+    #         data_batch.append(test_cov_vector[0])
+    #         # print(data_batch.shape)
+    #         #
+    #         feed_dict = {enmod_2.data_train_: data_batch}
+    #         ss_output = sess.run(enmod_2.output_ss, feed_dict=feed_dict)
+    #         ss_min = np.min(ss_output)
+    #         ss_output_regularized = [ss if ss > -ss_min else [0.0] for ss in ss_output]
+    #
+    #         est_DOA_ii = get_DOA_estimate(ss_output, test_DOA, doa_min, grid_ss)
+    #         est_DOA.append(est_DOA_ii)
+    #         MSE_rho += np.square((est_DOA_ii - test_DOA))
 
-            est_DOA_ii = get_DOA_estimate(ss_output, test_DOA, doa_min, grid_ss)
-            est_DOA.append(est_DOA_ii)
-            MSE_rho += np.square((est_DOA_ii - test_DOA))
-
-    RMSE_rho = np.sqrt(MSE_rho / (num_epoch_test))
-    RMSE.append(RMSE_rho)
+    # RMSE_rho = np.sqrt(MSE_rho / (num_epoch_test))
+    # RMSE.append(RMSE_rho)
 
 # Test
 test_DOA = np.array([20, 30])
