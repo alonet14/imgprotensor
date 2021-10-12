@@ -1,4 +1,4 @@
-import plaidml.keras
+# import plaidml.keras
 # plaidml.keras.install_backend()
 # import tensorflow
 import numpy

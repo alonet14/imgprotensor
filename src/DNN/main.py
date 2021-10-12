@@ -52,7 +52,9 @@ grid_ss = 1  # inter-grid angle in spatial spectrum
 # NUM_GRID_SS = int((doa_max - doa_min + 0.5 * grid_ss) / grid_ss)  # spectrum grids
 NUM_GRID_SS = int((doa_max - doa_min + 0.5 * grid_ss) / grid_ss)
 L = 2  # number of hidden layer
-input_size_ss = M * (M - 1)
+
+# input_size_ss = M * (M - 1)
+input_size_ss = 2000
 hidden_size_ss = [int(2 / 3 * input_size_ss), int(4 / 9 * input_size_ss), int(1 / 3 * input_size_ss)]
 output_size_ss = int(NUM_GRID_SS / SF_NUM)
 batch_size_ss = 32
