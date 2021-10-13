@@ -9,45 +9,51 @@ import json
 PROJECT_PATH = Path(__file__).parent.parent.parent.parent
 CONFIG_DATA_FOLDER = str(PROJECT_PATH) + '\\dataset\\recorded_data_gen'
 
+
 def define_label(number):
-    index=number-50
-    raw_arr=np.zeros((90))
-    raw_arr[index]=1
+    index = number - 50
+    raw_arr = np.zeros((90))
+    raw_arr[index] = 1
     return raw_arr
 
+
 def read_all_data_and_labeling(folder_data):
-    values=[]
-    labels=[]
+    values = []
+    labels = []
 
     for root, _dir, filenames in os.walk(folder_data):
+        count = 0
         for filename in filenames:
-            splited_filename=filename.split("_")
-            label_from_filename=splited_filename[1].split(".")
-            label=label_from_filename[0]
-            one_hot_label=define_label(int(label))
+            # print(filename)
+            splited_filename = filename.split("_")
+            label_from_filename = splited_filename[1].split(".")
+            label = label_from_filename[0]
+            one_hot_label = define_label(int(label))
             file_path = root + '\\' + filename
             data = rf.read_data_trainning_file(file_path)
-            value=data.to_numpy()
-            rows=value.shape[0]
+            value = data.to_numpy()
+            rows = value.shape[0]
             for j in range(rows):
                 values.append(value[j, 1:])
             for i in range(rows):
                 labels.append(one_hot_label)
+            if count > 5:
+                break
+            count += 1
             # list_data_frame.append(data)
     return values, labels
 
 
-
 # data_train duoi dang dataframe
 def generate_spec_batches(data_train, batch_size):
-    values, labels=data_train
+    values, labels = data_train
     data_len = len(labels)
 
-
+    print(np.where(labels[301]==1))
     # shuffle data
-    shuffle_seq = np.random.permutation(range(data_len))
-    values = [values[idx] for idx in shuffle_seq]
-    labels = [labels[idx] for idx in shuffle_seq]
+    # shuffle_seq = np.random.permutation(range(data_len))
+    # values = [values[idx] for idx in shuffle_seq]
+    # labels = [labels[idx] for idx in shuffle_seq]
 
     # generate batches
     num_batch = int(data_len / batch_size)
