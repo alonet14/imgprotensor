@@ -2,7 +2,7 @@ import scipy.linalg as la
 from controller.data_controller import *
 from src.DNN.ml_model.ensemble_model import *
 
-# from utils import *
+
 
 # DUONG DAN DEN THU MUC CHUA DU LIEU
 PROJECT_PATH = Path(__file__).parent.parent.parent
@@ -17,8 +17,8 @@ wavelength = c / fc  # signal wavelength
 d = 0.5 * wavelength  # inter-sensor distance
 
 # # spatial filter training parameters
-doa_min = -60  # minimal DOA (degree)
-doa_max = 60  # maximal DOA (degree)
+doa_min = 50  # minimal DOA (degree)
+doa_max = 139  # maximal DOA (degree)
 grid_sf = 1  # DOA step (degree) for generating different scenarios
 # GRID_NUM_SF = int((doa_max - doa_min) / grid_sf)
 GRID_NUM_SF = int((doa_max - doa_min) / grid_sf)
@@ -31,9 +31,12 @@ noise_flag_sf = 1  # 0: noise-free; 1: noise-present
 amp_or_phase = 0  # show filter amplitude or phase: 0-amplitude; 1-phase
 
 # # autoencoder parameters
-input_size_sf = M * (M - 1)
+input_size_sf = 2000
+
 hidden_size_sf = int(1 / 2 * input_size_sf)
-output_size_sf = input_size_sf
+hidden_size_sf = 15
+output_size_sf = 90
+
 batch_size_sf = 32
 num_epoch_sf = 1000
 learning_rate_sf = 0.001
