@@ -22,7 +22,7 @@ def read_all_data_and_labeling(folder_data):
     labels = []
 
     for root, _dir, filenames in os.walk(folder_data):
-        count = 0
+
         for filename in filenames:
             # print(filename)
             splited_filename = filename.split("_")
@@ -37,9 +37,7 @@ def read_all_data_and_labeling(folder_data):
                 values.append(value[j, 1:])
             for i in range(rows):
                 labels.append(one_hot_label)
-            if count > 5:
-                break
-            count += 1
+
             # list_data_frame.append(data)
     return values, labels
 
