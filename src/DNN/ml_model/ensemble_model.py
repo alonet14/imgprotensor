@@ -23,9 +23,9 @@ class Ensemble_Model():
         # place holder
         # 2000 : kich thuoc du lieu
         self.data_train_ = tf.placeholder(tf.float32, shape=[None, 2000])
+
         # 90: so lượng nhan
         self.label_sf_ = tf.placeholder(tf.float32, shape=[None, 90])
-
         self.data_train = tf.transpose(self.data_train_)
         self.label_sf = tf.transpose(self.label_sf_)
 
@@ -216,6 +216,7 @@ class Ensemble_Model():
                 #     trainable=False, name='boo')
 
         # feed-forward
+
         # dau ra mang thu thu hai
         self.output_ss_ = []
         for sf_idx in range(SF_NUM):

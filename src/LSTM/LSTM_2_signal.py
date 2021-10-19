@@ -1,4 +1,3 @@
-import numpy as np
 from Model_LSTM import Ensemble_Model
 
 def generate_spec_batches(data_train, batch_size, noise_flag):
@@ -279,7 +278,7 @@ def get_DOA_estimate(spec, DOA, doa_min, grid):
     return doa_est
 
 
-from controller.data_controller import *
+from src.controller.data_controller_dnn import *
 import tensorflow.compat.v1 as tf
 
 PROJECT_PATH = Path(__file__).parent.parent.parent

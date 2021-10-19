@@ -1,8 +1,6 @@
 import scipy.linalg as la
-from controller.data_controller import *
+from src.controller.data_controller_dnn import *
 from src.DNN.ml_model.ensemble_model import *
-
-
 
 # DUONG DAN DEN THU MUC CHUA DU LIEU
 PROJECT_PATH = Path(__file__).parent.parent.parent
@@ -197,6 +195,7 @@ for rho in Rho:
         #                                              NUM_REPEAT_SS, grid_ss, NUM_GRID_SS, MC_mtx, AP_mtx, pos_para)
         data_train_ss=read_all_data_and_labeling(CONFIG_DATA_FOLDER)
         tf.reset_default_graph()
+
         enmod_2 = Ensemble_Model(input_size_sf=input_size_sf,
                                  hidden_size_sf=hidden_size_sf,
                                  output_size_sf=output_size_sf,

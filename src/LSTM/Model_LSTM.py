@@ -21,6 +21,7 @@ class Ensemble_Model():
         #Reshape to prepare input to hidden activation
         self.data_train = tf.reshape(self.data_train, [-1, input_size_ss])
         self.data_train = tf.nn.relu(tf.matmul(self.data_train_,_weights['hidden']) + _biases['hidden'])
+
         #Split data because rnn cell needs a list of inputs for the RNN inner loop
         self.data_train = tf.split(self.data_train, 1, 0)
         # new shape: n_steps * (batch_size, n_hidden)
@@ -39,9 +40,11 @@ class Ensemble_Model():
         self.output_ss = tf.matmul(lstm_last_output, _weights['out']) + _biases['out']
         self.output_ss = tf.concat(self.output_ss, axis=0)
         self.output_ss = tf.transpose(self.output_ss)
+
         # loss and optimizer
         self.error_ss = self.label_ss - self.output_ss
         self.loss_ss = tf.reduce_mean(tf.norm(tf.square(self.error_ss), ord=1))
+
         # Tối ưu hóa loss với adam
         self.train_op_ss = tf.train.AdamOptimizer(
             learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-08, use_locking=False,
@@ -59,8 +62,13 @@ class Ensemble_Model():
         # self.correct_pred += np.sum(tf.equal(tf.argmax(self.output_ss, 1), tf.argmax(self.label_ss, 1)))
         # self.accuracy_ss = 100. * self.correct_pred / self.total
         # # self.accuracy_ss = tf.reduce_mean(tf.cast(self.correct_pred, tf.float32))
+
+        #tf.argmax: tra ve gia tri long nhat tren mot truc cua tensor
+        #tf.equal: tra ve mot tensor gom cac gia tri boolean
         self.correct_pred = tf.equal(tf.argmax(self.output_ss, 1), tf.argmax(self.label_ss, 1))
+        #tinh toan so luong nhan dung
         self.accuracy = tf.reduce_sum(tf.cast(self.correct_pred, tf.int32))
+
         self._acc = tf.reduce_mean(tf.cast(self.correct_pred, tf.float32))
 
         # self.basicLstm1 = tf.nn.rnn_cell.LSTMCell(n_hidden)
@@ -74,7 +82,7 @@ class Ensemble_Model():
         #
         # self.error_ss = self.label_ss - self.pred
         # self.loss_ss = tf.reduce_mean(tf.norm(tf.square(self.error_ss), ord=1))
-        # # Tối ưu hóa loss với adam
+        # Tối ưu hóa loss với adam
         # self.train_op_ss = tf.train.AdamOptimizer(
         #     learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-08, use_locking=False,
         #     name='Adam'
